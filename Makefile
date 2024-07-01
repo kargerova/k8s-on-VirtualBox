@@ -18,31 +18,44 @@ RESET  =$(shell tput -Txterm sgr0)
 
 
 # --------------------------------
+# Targets
+# -------------------------------
+targs = RunUpdate TerraformInstall TerraformRun GoodByePart
+
+all: $(targs)
+
+# --------------------------------
 # Scripts
 # -------------------------------
 HelloPart:
-  @echo '*****$(PURPLE) Make script started 🚀$(RESET) *****'
+	@echo "*****$(PURPLE) Make script started 🚀$(RESET)*****"
 
 UpdateSoftware:
-  @echo 'Updating software'
-  @sudo apt update -y
+	@echo "Updating software"
+	sudo apt update -y && sudo apt upgrade -y
 
 TerraformInstall:
-  # download and save the hashicorp PGP keys
-  @wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-  # add to package providers
-  @echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-  # install Terraform
-  @sudo apt update && sudo apt install terraform
-  # verify version
-  @terraform -v
+	@echo '*****$(PURPLE) Installing Terraform $(RESET)*****'
+    # check if Terraform is already installed
+	if [ -x "$(command -v terraform)" ]; then \
+		echo "Terraform is already installed. Skipping installation."; \
+		exit 0; \
+	fi
+    # install Terraform
+	sudo snap install terraform --classic
+    # verify version
+	echo terraform -v
 
 TerraformRun:
-  @echo '*****$(PURPLE) Running Terraform $(RESET)*****'
-  @cd ./Terraform-VirtualBox 
-  @terraform init
+	@echo '*****$(PURPLE) Running Terraform $(RESET)*****'
+	if [ -d "./Terraform-VirtualBox" ] && [ "$(shell ls ./Terraform-VirtualBox/*.tf 2> /dev/null | wc -l)" -gt "0" ]; then \
+			cd ./Terraform-VirtualBox && terraform init && terraform plan; \
+	else \
+			echo "No Terraform configuration files found in ./Terraform-VirtualBox or directory does not exist."; \
+	fi
+	cd ./Terraform-VirtualBox && terraform apply -auto-approve
 
 GoodByePart:
-  @echo '***** END of Make script. Have a nice day 😊 *****'
+	@echo '***** END of Make script. Have a nice day 😊 *****'
 
-RunUpdate: HelloPart UpdateSoftware GoodByePart
+RunUpdate: HelloPart UpdateSoftware 
