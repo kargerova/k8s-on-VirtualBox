@@ -14,4 +14,4 @@ Configuration snippets and scripts
 
 #### Check if is installed
 Simply run: `make` <br>
-Response shoudl be: `make: *** No targets specified and no makefile found.  Stop.`
+Response should be: `make: *** No targets specified and no makefile found.  Stop.`
