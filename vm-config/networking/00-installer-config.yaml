@@ -1,0 +1,22 @@
+# Two network-cards configuration
+# Author: kargerova
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp0s3:
+      # VirtualBox NAT network: VM to host network interface (used for internet connection), VM is isolated behind own VirtualBox router. Docs: https://www.virtualbox.org/manual/ch09.html#nat-address-config
+      dhcp4: true
+      routes:
+      - to: 0.0.0.0/0
+        via: 10.0.2.2
+    enp0s8:
+      # VirtualBox host-only network (used for connecting to VM from host via SSH) 
+      dhcp4: no
+      addresses: [192.168.56.2/24]
+      nameservers:
+        addresses: [1.1.1.1, 8.8.8.8]
+      routes:
+      - to: 192.168.56.0/24
+        via: 192.168.56.1
+  
